@@ -539,6 +539,36 @@ def test_path_a7(assert_pixels):
 
 
 @assert_no_logs
+def test_path_a_zero_radius(assert_pixels):
+    # Regression test for #2974: arcs with a zero radius are straight lines to
+    # their (absolute or relative) end point.
+    assert_pixels('''
+        ____________
+        _BBBB_______
+        _BBBB_______
+        _BBBB_______
+        _BBBB_______
+        ____________
+        ____________
+        _______RRRR_
+        _______RRRR_
+        _______RRRR_
+        _______RRRR_
+        ____________
+    ''', '''
+      <style>
+        @page { size: 12px }
+        svg { display: block }
+      </style>
+      <svg width="12px" height="12px" xmlns="http://www.w3.org/2000/svg">
+        <path d="M 1 1 A 0 0 0 0 1 5 1 L 5 5 A 0 3 0 0 1 1 5 Z" fill="blue"/>
+        <path d="M 7 7 a 5 0 0 0 1 4 0 L 11 11 a 0 0 0 0 1 -4 0 Z"
+          fill="red"/>
+      </svg>
+    ''')
+
+
+@assert_no_logs
 def test_path_wrong_point(assert_pixels):
     assert_pixels('''
         ____________
