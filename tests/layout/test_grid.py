@@ -1774,6 +1774,58 @@ def test_grid_break_container():
 
 
 @assert_no_logs
+def test_grid_break_container_float():
+    # Regression test for #2962.
+    page1, page2 = render_pages('''
+      <style>
+        @page { size: 10px 11px }
+        body { font: 2px / 1 weasyprint }
+        section { display: grid; grid-template-columns: 1fr 1fr }
+      </style>
+      <p>1<br>2<br>3<br>4</p>
+      <section style="break-inside: avoid">
+        <div><span style="float: right">5</span>6</div>
+        <div>7</div>
+        <div>8</div>
+        <div>9</div>
+      </section>
+    ''')
+    html, = page1.children
+    body, = html.children
+    p, = body.children
+    assert len(p.children) == 4
+    html, = page2.children
+    body, = html.children
+    section, = body.children
+    assert len(section.children) == 4
+
+
+@assert_no_logs
+def test_grid_break_first_row_float():
+    # Regression test for #2962.
+    page1, page2 = render_pages('''
+      <style>
+        @page { size: 10px 11px }
+        body { font: 2px / 1 weasyprint }
+        section { display: grid; grid-template-columns: 1fr 1fr }
+      </style>
+      <p>1<br>2<br>3<br>4</p>
+      <section>
+        <div><span style="float: right">5</span>6</div>
+        <div style="break-inside: avoid">7<br>8<br>9</div>
+      </section>
+    ''')
+    html, = page1.children
+    body, = html.children
+    p, = body.children
+    assert len(p.children) == 4
+    html, = page2.children
+    body, = html.children
+    section, = body.children
+    assert len(section.children) == 2
+
+
+@assert_no_logs
 def test_grid_bottom_page():
     page1, page2 = render_pages('''
       <style>
